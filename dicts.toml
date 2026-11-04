@@ -1,0 +1,38 @@
+# Sources for gloss/dict/<pair>.tsv, read by tools/build_dicts.py.
+#
+# To use your own dictionary, copy this file, edit or add [[source]] entries,
+# and run:  python3 tools/build_dicts.py --config my-dicts.toml
+# or override one URL:  python3 tools/build_dicts.py --url cc-cedict=https://...
+#
+# Fields:
+#   name         short id, used by --only and --url
+#   pair         <input language>-<target language>, e.g. zh-en
+#   format       cedict | jmdict | ecdict | tsv (text<TAB>gloss[<TAB>pos], any order)
+#   url          https:// URL or a local path; .gz and .zip are unpacked
+#   license      shown in gloss/dict/SOURCES.md
+#   attribution  shown in gloss/dict/SOURCES.md
+# When two sources write the same pair, the one listed first wins for a word.
+
+[[source]]
+name = "cc-cedict"
+pair = "zh-en"
+format = "cedict"
+url = "https://www.mdbg.net/chinese/export/cedict/cedict_1_0_ts_utf-8_mdbg.txt.gz"
+license = "CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)"
+attribution = "CC-CEDICT, MDBG (https://cc-cedict.org/wiki/)"
+
+[[source]]
+name = "jmdict"
+pair = "ja-en"
+format = "jmdict"
+url = "https://www.edrdg.org/pub/Nihongo/JMdict_e.gz"
+license = "CC BY-SA 4.0, EDRDG licence (https://www.edrdg.org/edrdg/licence.html)"
+attribution = "This publication has included material from the JMdict (EDICT, etc.) dictionary files in accordance with the licence provisions of the Electronic Dictionaries Research Group. See https://www.edrdg.org/"
+
+[[source]]
+name = "ecdict"
+pair = "en-zh"
+format = "ecdict"
+url = "https://raw.githubusercontent.com/skywind3000/ECDICT/master/ecdict.csv"
+license = "MIT (https://github.com/skywind3000/ECDICT/blob/master/LICENSE)"
+attribution = "ECDICT by skywind3000 (https://github.com/skywind3000/ECDICT)"

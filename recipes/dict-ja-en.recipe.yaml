@@ -1,0 +1,10 @@
+# encoding: utf-8
+---
+recipe:
+  Rx: dict-ja-en
+  args:
+  description: >-
+    Imported ja-en dictionary for rime-gloss (license: see gloss/dict/SOURCES.md)
+  install_files: >-
+    gloss/dict/ja-en.tsv
+    gloss/dict/SOURCES.md

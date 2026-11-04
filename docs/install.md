@@ -32,6 +32,18 @@ bash rime-install lyfuci/rime-gloss:recipes/ice
 
 装完在前端里「重新部署」。
 
+## 大词表
+
+默认配方只装种子词表。要「词典里有的词都显示」，再装对应语言对的词典：
+
+```bash
+bash rime-install lyfuci/rime-gloss:recipes/dict-zh-en   # 中文输入看英语
+bash rime-install lyfuci/rime-gloss:recipes/dict-en-zh   # 英文输入看中文
+bash rime-install lyfuci/rime-gloss:recipes/dict-ja-en   # 日文输入看英语
+```
+
+想用最新上游或自己的词典来源，见 README 的「更新词典、换成自己的来源」。
+
 ## 接到你正在用的方案
 
 这是学习输入时最有用的接法：继续用雾凇 / 明月 / 双拼，只多一行注释。
