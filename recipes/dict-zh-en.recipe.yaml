@@ -1,0 +1,10 @@
+# encoding: utf-8
+---
+recipe:
+  Rx: dict-zh-en
+  args:
+  description: >-
+    Imported zh-en dictionary for rime-gloss (license: see gloss/dict/SOURCES.md)
+  install_files: >-
+    gloss/dict/zh-en.tsv
+    gloss/dict/SOURCES.md

@@ -4,7 +4,7 @@ recipe:
   Rx: dicts_only
   args:
   description: >-
-    Update gloss TSV data only
+    Update the hand-written seed gloss lists only
   install_files: >-
     gloss/zh-en.tsv
     gloss/zh-ja.tsv

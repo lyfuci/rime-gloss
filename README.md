@@ -68,7 +68,34 @@ bash rime-install lyfuci/rime-gloss:recipes/ice
 运行<TAB>run<TAB>v.
 ```
 
-现在只有中文到英语、日语的约 290 个种子词。导入开源词典（CC-CEDICT、JMdict、ECDICT）在做。
+种子词表是中文到英语、日语的约 290 个常用词。大词表从开源词典导入，按需安装：
+
+| 配方 | 语言对 | 来源 | 条目 | 许可证 |
+| --- | --- | --- | --- | --- |
+| `:recipes/dict-zh-en` | 中文 → 英语 | CC-CEDICT | 约 20 万 | CC BY-SA 4.0 |
+| `:recipes/dict-ja-en` | 日语 → 英语 | JMdict | 约 47 万 | CC BY-SA 4.0（EDRDG） |
+| `:recipes/dict-en-zh` | 英语 → 中文 | ECDICT（常用 5 万词 + 考试词表） | 约 6 万 | MIT |
+| `:recipes/dicts` | 以上全部 | | | |
+
+```bash
+bash rime-install lyfuci/rime-gloss lyfuci/rime-gloss:recipes/dict-zh-en
+```
+
+### 更新词典、换成自己的来源
+
+输入法本身不联网。词典有两种更新方式：
+
+- **跟着仓库更新**：仓库每周从上游重新生成一次词典。重新运行上面的 `rime-install` 命令，再重新部署。
+- **自己生成**：克隆本仓库后运行 `tools/build_dicts.py`，直接写进 Rime 用户目录：
+
+  ```bash
+  python3 tools/build_dicts.py --rime-dir "$APPDATA/Rime"             # 全部，最新上游
+  python3 tools/build_dicts.py --rime-dir "$APPDATA/Rime" --only zh-en
+  python3 tools/build_dicts.py --rime-dir "$APPDATA/Rime" --url cc-cedict=https://example.org/cedict.txt.gz
+  python3 tools/build_dicts.py --rime-dir "$APPDATA/Rime" --config my-dicts.toml
+  ```
+
+  来源、格式和 URL 写在 [dicts.toml](dicts.toml)。复制一份改成自己的，可以换镜像、用本地文件，或加新的语言对；格式支持 `cedict`、`jmdict`、`ecdict` 和通用的 `tsv`（`词<TAB>释义<TAB>词性`）。生成后重新部署。
 
 只做精确匹配：`学习` 有注释，不代表 `学习英语` 也有。例句、读音、整句翻译、联网词典不在范围内，它们不该塞进候选栏。
 
@@ -77,8 +104,9 @@ bash rime-install lyfuci/rime-gloss:recipes/ice
 | 命令后缀 | 内容 |
 | --- | --- |
 | `lyfuci/rime-gloss` | 词表 + Lua 滤镜 + 明月试用方案 |
-| `:recipes/dicts_only` | 只更新词表 |
+| `:recipes/dicts_only` | 只更新种子词表 |
 | `:recipes/ice` | 上面的全部，再加雾凇试用方案 |
+| `:recipes/dict-<语言对>`、`:recipes/dicts` | 导入的大词表，见上文 |
 
 ## 开发
 
@@ -86,8 +114,10 @@ bash rime-install lyfuci/rime-gloss:recipes/ice
 python3 tools/validate_tsv.py        # 词表格式、大词表排序
 lua5.4 tests/filter_test.lua         # 滤镜（模拟 Rime 环境）
 python3 tests/enable_schema_test.py  # 接入脚本
+python3 tests/build_dicts_test.py    # 词典转换（离线样例）
+lua5.4 tests/dict_lookup_test.lua    # 在真实大词表上二分查找
 ```
 
 ## 许可
 
-代码、脚本和种子词表使用 [MIT](LICENSE)。从第三方词典导入的数据保留各自的许可证，放在单独的目录并注明出处，不按 MIT 再分发。
+代码、脚本和种子词表使用 [MIT](LICENSE)。`gloss/dict/` 下导入的词典不属于 MIT，各自保留来源的许可证，出处、版本和许可证见 [gloss/dict/SOURCES.md](gloss/dict/SOURCES.md)。CC BY-SA 的词典再分发或修改后仍须按 CC BY-SA 共享。

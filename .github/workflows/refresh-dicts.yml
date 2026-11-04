@@ -1,0 +1,50 @@
+name: refresh-dicts
+
+# Weekly: rebuild gloss/dict/ from the upstream sources in dicts.toml and
+# propose the result as a pull request (never a direct push to main).
+on:
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Rebuild dictionaries
+        run: python3 tools/build_dicts.py --cache "$RUNNER_TEMP/dict-cache"
+      - name: Validate
+        run: |
+          python3 tools/validate_tsv.py
+          sudo apt-get update -q && sudo apt-get install -y -q lua5.4
+          lua5.4 tests/dict_lookup_test.lua
+      - name: Propose changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # SOURCES.md changes every run (build date); only the data matters.
+          if git diff --quiet -- 'gloss/dict/*.tsv'; then
+            echo "dictionaries unchanged"
+            exit 0
+          fi
+          branch=bot/refresh-dicts
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
+          git add gloss/dict
+          git commit -m "Refresh imported dictionaries from upstream"
+          git push --force origin "$branch"
+          if gh pr view "$branch" --json state -q .state 2>/dev/null | grep -q OPEN; then
+            echo "updated the open pull request"
+          elif ! gh pr create --base main --head "$branch" --title "Refresh imported dictionaries" \
+              --body "Weekly rebuild of gloss/dict/ from the sources in dicts.toml. See gloss/dict/SOURCES.md for versions and licenses."; then
+            echo "::warning::Could not open a pull request (allow GitHub Actions to create pull requests in the repository settings). Open it by hand: ${{ github.server_url }}/${{ github.repository }}/compare/main...$branch"
+          fi
