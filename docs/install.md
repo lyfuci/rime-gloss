@@ -2,6 +2,31 @@
 
 适用：小狼毫 Weasel、鼠须管 Squirrel、fcitx5-rime、ibus-rime。包本身不绑定小狼毫。
 
+## 前提
+
+需要带 librime-lua、支持 `lua_filter@*模块名` 写法的 Rime：
+
+- 小狼毫 0.15 及以上（自带 librime-lua）。
+- 鼠须管 1.0 及以上。
+- fcitx5-rime / ibus-rime：装 librime 的 Lua 插件（Debian/Ubuntu `librime-plugin-lua`，Arch `librime-lua`）。
+
+## Windows 小狼毫，从零开始
+
+1. 从 <https://rime.im/download/> 装小狼毫，装完先「重新部署」一次，让 `%APPDATA%\Rime` 生成出来。
+2. 装 [Git for Windows](https://git-scm.com/download/win)，打开 **Git Bash**，运行：
+
+   ```bash
+   git clone --depth 1 https://github.com/rime/plum.git ~/plum
+   cd ~/plum
+   rime_dir="$APPDATA/Rime" bash rime-install lyfuci/rime-gloss lyfuci/rime-gloss:recipes/dict-zh-en
+   ```
+
+   第二个参数是中文→英语大词表（约 7 MB），不要可以去掉。
+3. 右键托盘里的小狼毫图标 →「输入法设定」，勾选「明月拼音·释义」，确定后会自动部署。
+4. 切到「明月拼音·释义」，打 `xuexi`，候选「学习」旁边应显示 `v. study/learn`。按 `F4`（或 `` Ctrl+` ``）打开方案菜单，可以在 `释义关 / 英 / 日 / 全部` 之间切换。
+
+要接到雾凇等已有方案上，看下面的「接到你正在用的方案」。
+
 ## 东风破 plum（推荐）
 
 先装 git、bash。Windows 可用 Git Bash。

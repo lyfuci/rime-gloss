@@ -20,7 +20,7 @@ if ($targetList.Count -gt 1) {
     $states += "全部"
 }
 $snippet = @"
-  engine/filters/@next: lua_filter@rime_gloss_filter
+  engine/filters/@next: lua_filter@*rime_gloss_filter
   switches/@next: {options: [$($options -join ', ')], states: [$($states -join ', ')], reset: 1}
   rime_gloss/source: $Source
   rime_gloss/targets: [$($targetList -join ', ')]

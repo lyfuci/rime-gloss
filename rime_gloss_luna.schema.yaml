@@ -1,15 +1,22 @@
 # encoding: utf-8
 # 不改你现有方案，多一个可切换的「明月拼音·释义」。
 # 小狼毫 / 鼠须管 / fcitx 自带 luna_pinyin，因此默认可部署。
+#
+# schema_id 必须写在文件顶层：Rime 部署时先读原始文件里的 schema/schema_id，
+# 之后才展开 __include / __patch。其余设置从明月拼音继承。
+
+schema:
+  schema_id: rime_gloss_luna
+  name: 明月拼音·释义
+  version: "0.2.0"
+  description: |
+    明月拼音 + rime-gloss 英/日释义。学习向，不改变上屏文本。
 
 __include: luna_pinyin.schema:/
-
 __patch:
-  schema/schema_id: rime_gloss_luna
-  schema/name: 明月拼音·释义
-  schema/version: "0.2.0"
-  schema/description: "luna_pinyin + rime-gloss 英/日释义。学习向，不改变上屏文本。"
-  engine/filters/@next: lua_filter@rime_gloss_filter
+  # 明月拼音默认出繁体；种子词表是简体词条，所以试用方案默认简体（第 3 个开关）。
+  switches/@2/reset: 1
+  engine/filters/@next: lua_filter@*rime_gloss_filter
   switches/@next:
     options: [gloss_off, gloss_en, gloss_ja, gloss_all]
     states: [释义关, 英, 日, 全部]

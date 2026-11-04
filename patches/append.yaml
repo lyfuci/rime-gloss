@@ -4,12 +4,12 @@
 # 或用 tools/enable_schema.py --source en --targets zh 生成。
 #
 # patch:
-#   engine/filters/@next: lua_filter@rime_gloss_filter
+#   engine/filters/@next: lua_filter@*rime_gloss_filter
 #   switches/@next: {options: [gloss_off, gloss_en, gloss_ja, gloss_all], states: [释义关, 英, 日, 全部], reset: 1}
 #   rime_gloss/source: zh
 #   rime_gloss/targets: [en, ja]
 
-engine/filters/@next: lua_filter@rime_gloss_filter
+engine/filters/@next: lua_filter@*rime_gloss_filter
 switches/@next: {options: [gloss_off, gloss_en, gloss_ja, gloss_all], states: [释义关, 英, 日, 全部], reset: 1}
 rime_gloss/source: zh
 rime_gloss/targets: [en, ja]

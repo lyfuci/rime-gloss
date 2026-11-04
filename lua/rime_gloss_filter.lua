@@ -1,5 +1,5 @@
 -- rime-gloss: show short target-language glosses beside candidates of any
--- input language. Loaded as lua_filter@rime_gloss_filter.
+-- input language. Loaded as lua_filter@*rime_gloss_filter.
 --
 -- Schema config (all optional):
 --   rime_gloss/source:  input language of this schema's candidates (default zh)
