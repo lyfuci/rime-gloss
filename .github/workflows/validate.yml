@@ -42,8 +42,9 @@ jobs:
           cp -rL /usr/share/rime-data/. "$shared/"
           cp /usr/share/opencc/* "$shared/opencc/"
           cc -o "$RUNNER_TEMP/rime_probe" tests/e2e/rime_probe.c -lrime -ldl
+          git clone -q --depth 1 https://github.com/lazyfoxchan/rime-jaroomaji.git "$RUNNER_TEMP/jaroomaji"
           python3 tests/e2e/run_e2e.py --probe "$RUNNER_TEMP/rime_probe" --shared "$shared" \
-            --plugin /usr/lib/x86_64-linux-gnu/rime-plugins/librime-lua.so
+            --plugin /usr/lib/x86_64-linux-gnu/rime-plugins/librime-lua.so --jaroomaji "$RUNNER_TEMP/jaroomaji"
       - name: Install with the real plum from this branch, then test that
         env:
           REF: ${{ github.repository }}@${{ github.head_ref || github.ref_name }}

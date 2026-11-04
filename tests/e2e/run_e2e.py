@@ -91,6 +91,7 @@ def main() -> int:
     parser.add_argument("--plugin", required=True)
     parser.add_argument("--installed", type=Path, help="a user dir already filled by the real plum: "
                         "rime-install lyfuci/rime-gloss lyfuci/rime-gloss:dict-zh-en")
+    parser.add_argument("--jaroomaji", type=Path, help="a checkout of lazyfoxchan/rime-jaroomaji: also test Japanese input")
     args = parser.parse_args()
 
     # Every recipe is valid for plum.
@@ -138,6 +139,27 @@ def main() -> int:
         out = probe(args, user, "luna_pinyin", "nihao", gloss_off=False, gloss_en=True)
         assert out.get("你好"), f"你好 has a gloss: {out}"
         print("enable_schema on luna_pinyin: ok")
+
+        # 3. Japanese input: jaroomaji + the ja-en dictionary.
+        if args.jaroomaji:
+            user = Path(tmp) / "japanese"
+            user.mkdir()
+            for f in args.jaroomaji.glob("*.yaml"):
+                shutil.copy2(f, user / f.name)
+            install(user, "", "dict-ja-en")
+            (user / "default.custom.yaml").write_text("patch:\n  schema_list:\n    - schema: jaroomaji\n", encoding="utf-8")
+            enable = subprocess.run([sys.executable, str(ROOT / "tools" / "enable_schema.py"), "--schema", "jaroomaji",
+                                     "--source", "ja", "--targets", "en", "--rime-dir", str(user)], capture_output=True, text=True)
+            assert enable.returncode == 0, enable.stderr
+            # jaroomaji starts in ASCII mode.
+            out = probe(args, user, "jaroomaji", "taberu", ascii_mode=False)
+            eq(out.get("食べる"), "v. to eat", "Japanese verb")
+            out = probe(args, user, "jaroomaji", "neko", ascii_mode=False)
+            eq(out.get("猫"), "n. cat; feline", "Japanese noun")
+            eq(out.get("ネコ"), "n. cat; feline", "katakana falls back to the hiragana reading")
+            out = probe(args, user, "jaroomaji", "arigatou", ascii_mode=False)
+            eq(out.get("ありがとう"), "int. thank you; thanks", "kana word")
+            print("jaroomaji: ok")
 
     print("e2e: ok")
     return 0

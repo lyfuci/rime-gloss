@@ -69,6 +69,21 @@ bash rime-install lyfuci/rime-gloss:dict-ja-en   # 日文输入看英语
 
 想用最新上游或自己的词典来源，见 README 的「更新词典、换成自己的来源」。
 
+## 日语输入
+
+小狼毫不带日语方案。推荐 [rime-jaroomaji](https://github.com/lazyfoxchan/rime-jaroomaji)（罗马字输入）。装上它和日→英词典，再给它接上释义：
+
+```bash
+cd ~/plum
+rime_dir="$APPDATA/Rime" bash rime-install lazyfoxchan/rime-jaroomaji lyfuci/rime-gloss:dict-ja-en
+git clone --depth 1 https://github.com/lyfuci/rime-gloss.git ~/rime-gloss
+python3 ~/rime-gloss/tools/enable_schema.py --schema jaroomaji --source ja --targets en
+```
+
+把 `jaroomaji` 加进方案列表（「输入法设定」里勾选），重新部署。jaroomaji 默认是英数模式，按 `Shift` 切到「あ」再打，例如 `taberu` → 「食べる v. to eat」。片假名候选查不到时会按平假名再查一次（「ネコ」也显示 `n. cat`）。
+
+目前只有日→英；日→中没有合适的开源词典，可以自己往 `gloss/user_ja-zh.tsv` 加词，或在 `dicts.toml` 里配置来源。只做精确匹配，「食べた」这样的活用形没有释义。
+
 ## 接到你正在用的方案
 
 这是学习输入时最有用的接法：继续用雾凇 / 明月 / 双拼，只多一行注释。

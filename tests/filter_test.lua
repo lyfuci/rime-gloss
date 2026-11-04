@@ -163,6 +163,19 @@ eq(c["Apple"], "n. 苹果", "English input folds case; shared dictionary")
 eq(c["study"], "v. 学习", "English input")
 eq(c["nothing"], "", "English miss")
 
+-- Japanese input: katakana candidates fall back to the hiragana reading.
+eq(G.katakana_to_hiragana("ネコ"), "ねこ", "katakana to hiragana")
+eq(G.katakana_to_hiragana("コーヒー"), "こーひー", "long vowel mark kept")
+eq(G.katakana_to_hiragana("猫ねこ"), "猫ねこ", "no katakana, unchanged")
+write(user, "gloss/dict/ja-en.tsv", "ねこ\tcat\tn.\n猫\tcat\tn.\n")
+local ja = { ["rime_gloss/source"] = "ja", ["rime_gloss/targets"] = { "en" } }
+c = run(ja, { gloss_en = true }, { "猫", "ネコ", "イヌ" })
+eq(c["猫"], "n. cat", "Japanese kanji")
+eq(c["ネコ"], "n. cat", "katakana falls back to hiragana")
+eq(c["イヌ"], "", "katakana miss")
+c = run(zh, { gloss_en = true }, { "ネコ" })
+eq(c["ネコ"], "", "no katakana folding for Chinese input")
+
 -- Existing comments are kept.
 local env = { engine = engine(zh, { gloss_en = true }) }
 G.init(env)

@@ -97,6 +97,8 @@ bash rime-install lyfuci/rime-gloss lyfuci/rime-gloss:dict-zh-en
 
   来源、格式和 URL 写在 [dicts.toml](dicts.toml)。复制一份改成自己的，可以换镜像、用本地文件，或加新的语言对；格式支持 `cedict`、`jmdict`、`ecdict` 和通用的 `tsv`（`词<TAB>释义<TAB>词性`）。生成后重新部署。
 
+日语输入可以配 [rime-jaroomaji](https://github.com/lazyfoxchan/rime-jaroomaji)，步骤见 [docs/install.md](docs/install.md#日语输入)；片假名候选会按平假名再查一次。
+
 只做精确匹配：`学习` 有注释，不代表 `学习英语` 也有。例句、读音、整句翻译、联网词典不在范围内，它们不该塞进候选栏。
 
 ## 配方

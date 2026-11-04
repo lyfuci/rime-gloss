@@ -169,12 +169,32 @@ local function open_pair(source, target, dirs)
 end
 M.open_pair = open_pair
 
+-- Katakana to hiragana (ア..ヶ -> あ..ゖ); dictionaries list kana readings in hiragana.
+local function katakana_to_hiragana(text)
+  if not text:find("\xE3[\x82\x83]") then return text end
+  local ok, out = pcall(function()
+    local cps = {}
+    for _, cp in utf8.codes(text) do
+      cps[#cps + 1] = (cp >= 0x30A1 and cp <= 0x30F6) and cp - 0x60 or cp
+    end
+    return utf8.char(table.unpack(cps))
+  end)
+  return ok and out or text
+end
+M.katakana_to_hiragana = katakana_to_hiragana
+
+-- On a miss, a second lookup in a normalised form, per input language.
+local FOLDS = {
+  en = string.lower, -- candidates may be capitalised ("Hello")
+  ja = katakana_to_hiragana, -- ネコ finds ねこ
+}
+
 local function lookup(pair, text, fold)
   local hit = pair.mem[text]
   if not hit and pair.dict then hit = search_sorted(pair.dict, text) end
   if not hit and fold then
-    local lower = text:lower()
-    if lower ~= text then return lookup(pair, lower, false) end
+    local folded = fold(text)
+    if folded ~= text then return lookup(pair, folded, nil) end
   end
   return hit
 end
@@ -266,8 +286,7 @@ local function init(env)
     summary[#summary + 1] = string.format("%s-%s mem=%d dict=%s", source, target, pair.size, pair.dict and "yes" or "no")
   end
   env.default = config_string(config, "rime_gloss/default") or targets[1]
-  -- Candidates of Latin-script inputs may be capitalised ("Hello").
-  env.fold = source == "en"
+  env.fold = FOLDS[source]
   if log then log.info("[rime-gloss] " .. table.concat(summary, "; ") .. " default=" .. env.default) end
 end
 
