@@ -18,7 +18,7 @@
    ```bash
    git clone --depth 1 https://github.com/rime/plum.git ~/plum
    cd ~/plum
-   rime_dir="$APPDATA/Rime" bash rime-install lyfuci/rime-gloss lyfuci/rime-gloss:recipes/dict-zh-en
+   rime_dir="$APPDATA/Rime" bash rime-install lyfuci/rime-gloss lyfuci/rime-gloss:dict-zh-en
    ```
 
    第二个参数是中文→英语大词表（约 7 MB），不要可以去掉。
@@ -46,13 +46,13 @@ rime_dir="$HOME/.local/share/fcitx5/rime" bash rime-install lyfuci/rime-gloss
 只更新词表、不装脚本：
 
 ```bash
-bash rime-install lyfuci/rime-gloss:recipes/dicts_only
+bash rime-install lyfuci/rime-gloss:dicts_only
 ```
 
 已经装了雾凇、想多一个「雾凇拼音·释义」方案：
 
 ```bash
-bash rime-install lyfuci/rime-gloss:recipes/ice
+bash rime-install lyfuci/rime-gloss:ice
 ```
 
 装完在前端里「重新部署」。
@@ -62,12 +62,27 @@ bash rime-install lyfuci/rime-gloss:recipes/ice
 默认配方只装种子词表。要「词典里有的词都显示」，再装对应语言对的词典：
 
 ```bash
-bash rime-install lyfuci/rime-gloss:recipes/dict-zh-en   # 中文输入看英语
-bash rime-install lyfuci/rime-gloss:recipes/dict-en-zh   # 英文输入看中文
-bash rime-install lyfuci/rime-gloss:recipes/dict-ja-en   # 日文输入看英语
+bash rime-install lyfuci/rime-gloss:dict-zh-en   # 中文输入看英语
+bash rime-install lyfuci/rime-gloss:dict-en-zh   # 英文输入看中文
+bash rime-install lyfuci/rime-gloss:dict-ja-en   # 日文输入看英语
 ```
 
 想用最新上游或自己的词典来源，见 README 的「更新词典、换成自己的来源」。
+
+## 日语输入
+
+小狼毫不带日语方案。推荐 [rime-jaroomaji](https://github.com/lazyfoxchan/rime-jaroomaji)（罗马字输入）。装上它和日→英词典，再给它接上释义：
+
+```bash
+cd ~/plum
+rime_dir="$APPDATA/Rime" bash rime-install lazyfoxchan/rime-jaroomaji lyfuci/rime-gloss:dict-ja-en
+git clone --depth 1 https://github.com/lyfuci/rime-gloss.git ~/rime-gloss
+python3 ~/rime-gloss/tools/enable_schema.py --schema jaroomaji --source ja --targets en
+```
+
+把 `jaroomaji` 加进方案列表（「输入法设定」里勾选），重新部署。jaroomaji 默认是英数模式，按 `Shift` 切到「あ」再打，例如 `taberu` → 「食べる v. to eat」。片假名候选查不到时会按平假名再查一次（「ネコ」也显示 `n. cat`）。
+
+目前只有日→英；日→中没有合适的开源词典，可以自己往 `gloss/user_ja-zh.tsv` 加词，或在 `dicts.toml` 里配置来源。只做精确匹配，「食べた」这样的活用形没有释义。
 
 ## 接到你正在用的方案
 
