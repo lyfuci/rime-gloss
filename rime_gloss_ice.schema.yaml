@@ -1,16 +1,20 @@
 # encoding: utf-8
 # 可选。仅在已安装雾凇拼音（rime_ice.schema.yaml）时部署。
 # 不要放进默认配方：缺 rime_ice 时可能导致部署报错。
-# 安装：bash rime-install <user>/rime-gloss:recipes/ice
+# 安装：bash rime-install lyfuci/rime-gloss:recipes/ice
+#
+# schema_id 必须写在文件顶层（见 rime_gloss_luna.schema.yaml），其余从雾凇继承。
+
+schema:
+  schema_id: rime_gloss_ice
+  name: 雾凇拼音·释义
+  version: "0.2.0"
+  description: |
+    雾凇拼音 + rime-gloss 英/日释义。学习向，不改变上屏文本。
 
 __include: rime_ice.schema:/
-
 __patch:
-  schema/schema_id: rime_gloss_ice
-  schema/name: 雾凇拼音·释义
-  schema/version: "0.2.0"
-  schema/description: "雾凇拼音 + rime-gloss 英/日释义。学习向，不改变上屏文本。"
-  engine/filters/@next: lua_filter@rime_gloss_filter
+  engine/filters/@next: lua_filter@*rime_gloss_filter
   switches/@next:
     options: [gloss_off, gloss_en, gloss_ja, gloss_all]
     states: [释义关, 英, 日, 全部]

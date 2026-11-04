@@ -24,7 +24,7 @@ bash rime-install lyfuci/rime-gloss
 rime_dir="$HOME/.local/share/fcitx5/rime" bash rime-install lyfuci/rime-gloss
 ```
 
-详细说明见 [docs/install.md](docs/install.md)。
+需要带 librime-lua 的 Rime（小狼毫 0.15+、鼠须管 1.0+，或装了 Lua 插件的 fcitx5/ibus）。Windows 从零开始的步骤和其他细节见 [docs/install.md](docs/install.md)。
 
 ## 接到你正在用的方案
 

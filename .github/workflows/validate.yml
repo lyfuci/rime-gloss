@@ -25,3 +25,22 @@ jobs:
         run: python3 tests/enable_schema_test.py
       - name: Dictionary build tests
         run: python3 tests/build_dicts_test.py
+
+  e2e:
+    # The real librime 1.10 + librime-lua from Ubuntu: deploy, type, read comments.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install librime, librime-lua and Rime data
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q librime-dev librime-plugin-lua rime-prelude rime-data-luna-pinyin rime-essay libopencc-data
+      - name: Real-Rime end-to-end test
+        run: |
+          shared="$RUNNER_TEMP/rime-shared"
+          mkdir -p "$shared/opencc"
+          cp -rL /usr/share/rime-data/. "$shared/"
+          cp /usr/share/opencc/* "$shared/opencc/"
+          cc -o "$RUNNER_TEMP/rime_probe" tests/e2e/rime_probe.c -lrime -ldl
+          python3 tests/e2e/run_e2e.py --probe "$RUNNER_TEMP/rime_probe" --shared "$shared" \
+            --plugin /usr/lib/x86_64-linux-gnu/rime-plugins/librime-lua.so

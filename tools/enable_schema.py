@@ -22,7 +22,7 @@ def snippet(source: str, targets: list[str]) -> str:
         options.append("gloss_all")
         states.append("全部")
     return (
-        "  engine/filters/@next: lua_filter@rime_gloss_filter\n"
+        "  engine/filters/@next: lua_filter@*rime_gloss_filter\n"
         f"  switches/@next: {{options: [{', '.join(options)}], states: [{', '.join(states)}], reset: 1}}\n"
         f"  rime_gloss/source: {source}\n"
         f"  rime_gloss/targets: [{', '.join(targets)}]\n"
