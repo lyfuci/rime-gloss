@@ -36,3 +36,19 @@ format = "ecdict"
 url = "https://raw.githubusercontent.com/skywind3000/ECDICT/master/ecdict.csv"
 license = "MIT (https://github.com/skywind3000/ECDICT/blob/master/LICENSE)"
 attribution = "ECDICT by skywind3000 (https://github.com/skywind3000/ECDICT)"
+
+# Chinese -> Japanese, derived: no open dictionary covers this pair, so it is
+# built from CC-CEDICT and JMdict (same written form with overlapping English
+# meanings, or an exact English-meaning match). See tools/cognates.py.
+# Override one input with --url cedict-jmdict-zh-ja.jmdict=PATH.
+[[source]]
+name = "cedict-jmdict-zh-ja"
+pair = "zh-ja"
+format = "cognates"
+license = "CC BY-SA 4.0 (derived from CC-CEDICT and JMdict); OpenCC tables Apache-2.0"
+attribution = "Derived from CC-CEDICT (MDBG, https://cc-cedict.org/wiki/) and JMdict (EDRDG, https://www.edrdg.org/; this publication has included material from the JMdict dictionary files in accordance with the licence provisions of the Electronic Dictionaries Research Group), with OpenCC's Japanese shinjitai tables (https://github.com/BYVoid/OpenCC, Apache-2.0)"
+[source.inputs]
+cedict = "https://www.mdbg.net/chinese/export/cedict/cedict_1_0_ts_utf-8_mdbg.txt.gz"
+jmdict = "https://www.edrdg.org/pub/Nihongo/JMdict_e.gz"
+shinjitai = "https://raw.githubusercontent.com/BYVoid/OpenCC/master/data/dictionary/JPShinjitaiCharacters.txt"
+shinjitai_phrases = "https://raw.githubusercontent.com/BYVoid/OpenCC/master/data/dictionary/JPShinjitaiPhrases.txt"

@@ -10,4 +10,5 @@ install_files: >-
   gloss/dict/zh-en.tsv
   gloss/dict/ja-en.tsv
   gloss/dict/en-zh.tsv
+  gloss/dict/zh-ja.tsv
   gloss/dict/SOURCES.md

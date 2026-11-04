@@ -75,11 +75,20 @@ bash rime-install lyfuci/rime-gloss:ice
 | `:dict-zh-en` | 中文 → 英语 | CC-CEDICT | 约 20 万 | CC BY-SA 4.0 |
 | `:dict-ja-en` | 日语 → 英语 | JMdict | 约 47 万 | CC BY-SA 4.0（EDRDG） |
 | `:dict-en-zh` | 英语 → 中文 | ECDICT（常用 5 万词 + 考试词表） | 约 6 万 | MIT |
+| `:dict-zh-ja` | 中文 → 日语 | 由 CC-CEDICT + JMdict 推导（见下） | 约 2.5 万词（简繁共 5.3 万键） | CC BY-SA 4.0 |
 | `:dicts` | 以上全部 | | | |
 
 ```bash
 bash rime-install lyfuci/rime-gloss lyfuci/rime-gloss:dict-zh-en
 ```
+
+中文 → 日语没有现成的开源词典，`dict-zh-ja` 是推导出来的，规则在 [tools/cognates.py](tools/cognates.py)：
+
+- **同形词**：中文词的繁体经 OpenCC 转成日文新字体（學習 → 学習），在 JMdict 里存在，并且两本词典的英文释义在主要义项上重合。`手纸`（卫生纸）和 `手紙`（信）这类不重合的会被排除。
+- **英文对译**：中文词的第一个释义和某个日语常用词（JMdict 的基础词汇 `ichi1`）的第一个释义完全相同，比如 "to eat" → 食べる。敬语、谦语、古语、罕用词不参与。
+- 两者都有时，同形词至少要和对译词一样常用才优先。`爱人`、`工作`、`先生` 这类出了名的「同形异义词」只走英文对译。
+
+推导结果会有不地道的地方，例如给出的是近义词而不是最常用的说法。最常用的约 290 个词以手写种子词表为准，种子表优先于大词表。发现明显错误的词，可以写进 `gloss/user_zh-ja.tsv` 覆盖，或者提 issue。
 
 ### 更新词典、换成自己的来源
 

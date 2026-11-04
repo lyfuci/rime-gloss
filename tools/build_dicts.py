@@ -34,7 +34,8 @@ from xml.etree import ElementTree
 
 ROOT = Path(__file__).resolve().parents[1]
 PAIR = re.compile(r"^[a-z]{2,3}-[a-z]{2,3}$")
-FORMATS = ("cedict", "jmdict", "ecdict", "tsv")
+FORMATS = ("cedict", "jmdict", "ecdict", "tsv", "cognates")
+COGNATE_INPUTS = ("cedict", "jmdict", "shinjitai", "shinjitai_phrases")
 MAX_DOWNLOAD = 256 * 1024 * 1024
 MAX_KEY_BYTES = 64
 MAX_GLOSS_CHARS = 60
@@ -240,6 +241,28 @@ PARSERS: dict[str, Callable[[bytes], Iterable[Entry]]] = {
 }
 
 
+_cognate_cache: dict[tuple, list] = {}
+
+
+def build_cognates(source: dict, cache: Path) -> tuple[Iterable[Entry], str]:
+    """zh-ja from CC-CEDICT + JMdict (+ OpenCC shinjitai tables); see tools/cognates.py."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import cognates  # noqa: E402  (stdlib-only sibling module)
+
+    raws = {name: fetch(source["inputs"][name], cache) for name in COGNATE_INPUTS}
+    key = tuple(hashlib.sha256(raws[n]).hexdigest() for n in COGNATE_INPUTS)
+    if key not in _cognate_cache:
+        data = {n: unpack(raws[n], source["inputs"][n]) for n in COGNATE_INPUTS}
+        _cognate_cache[key] = cognates.pair_words(data["cedict"].decode("utf-8"), data["jmdict"],
+                                                  data["shinjitai"].decode("utf-8"), data["shinjitai_phrases"].decode("utf-8"))
+    pairs = _cognate_cache[key]
+    if source["pair"] != "zh-ja":
+        raise SystemExit(f"{source['name']}: format cognates builds zh-ja, not {source['pair']}")
+    table = cognates.zh_ja
+    digest = hashlib.sha256("".join(key).encode()).hexdigest()
+    return ((k, short(g), p, (0,)) for k, (g, p) in table(pairs).items()), digest
+
+
 # --- building -----------------------------------------------------------------
 
 
@@ -276,19 +299,30 @@ def load_config(path: Path, overrides: list[str]) -> list[dict]:
     for item in overrides:
         name, sep, url = item.partition("=")
         if not sep or not url:
-            raise SystemExit(f"--url expects NAME=URL, got {item!r}")
+            raise SystemExit(f"--url expects NAME=URL or NAME.INPUT=URL, got {item!r}")
         urls[name] = url
     names = set()
     for source in sources:
-        missing = [k for k in ("name", "pair", "format", "url", "license") if not source.get(k)]
+        multi = source.get("format") == "cognates"
+        required = ("name", "pair", "format", "inputs" if multi else "url", "license")
+        missing = [k for k in required if not source.get(k)]
         if missing:
             raise SystemExit(f"{path}: source {source.get('name', '?')} lacks {', '.join(missing)}")
         if not PAIR.match(source["pair"]):
             raise SystemExit(f"{path}: {source['name']}: pair must look like zh-en")
         if source["format"] not in FORMATS:
             raise SystemExit(f"{path}: {source['name']}: format must be one of {', '.join(FORMATS)}")
-        source["url"] = urls.pop(source["name"], source["url"])
-        names.add(source["name"])
+        if multi:
+            source["inputs"] = dict(source["inputs"])
+            absent = [n for n in COGNATE_INPUTS if not source["inputs"].get(n)]
+            if absent:
+                raise SystemExit(f"{path}: {source['name']}: inputs lacks {', '.join(absent)}")
+            for n in COGNATE_INPUTS:
+                source["inputs"][n] = urls.pop(f"{source['name']}.{n}", source["inputs"][n])
+                names.add(f"{source['name']}.{n}")
+        else:
+            source["url"] = urls.pop(source["name"], source["url"])
+            names.add(source["name"])
     if urls:
         raise SystemExit(f"--url names not in {path}: {', '.join(urls)} (known: {', '.join(sorted(names))})")
     return sources
@@ -321,11 +355,15 @@ def main() -> int:
         merged: dict[str, tuple[str, str]] = {}
         for source in pair_sources:
             print(f"{pair}: {source['name']}", file=sys.stderr)
-            raw = fetch(source["url"], args.cache)
-            entries = best_entries(PARSERS[source["format"]](unpack(raw, source["url"])))
+            if source["format"] == "cognates":
+                produced, digest = build_cognates(source, args.cache)
+            else:
+                raw = fetch(source["url"], args.cache)
+                produced, digest = PARSERS[source["format"]](unpack(raw, source["url"])), hashlib.sha256(raw).hexdigest()
+            entries = best_entries(produced)
             for key, value in entries.items():
                 merged.setdefault(key, value)  # earlier sources win
-            manifest.append((pair, source, len(entries), hashlib.sha256(raw).hexdigest()[:12]))
+            manifest.append((pair, source, len(entries), digest[:12]))
         if not merged:
             raise SystemExit(f"{pair}: no entries parsed; is the format right?")
         write_sorted(out_dir / f"{pair}.tsv", merged)
@@ -340,13 +378,14 @@ def main() -> int:
     if old_manifest.exists():
         for line in old_manifest.read_text(encoding="utf-8").splitlines():
             m = re.match(r"^\| `([a-z-]+)\.tsv` \|", line) or re.match(r"^- \*\*[^*]+\*\* \(([a-z-]+)\):", line)
-            if m and m.group(1) not in by_pair:
+            # Rows of pairs this run did not rebuild, if their file is still there.
+            if m and m.group(1) not in by_pair and (out_dir / f"{m.group(1)}.tsv").exists():
                 (kept_rows if line.startswith("|") else kept_credits).append(line)
     for pair, source, count, digest in manifest:
         rows.append(f"| `{pair}.tsv` | {source['name']} | {count} | {source['license']} | {today} | `{digest}` |")
     rows += kept_rows
     rows += ["", "## Attribution", ""]
-    rows += [f"- **{source['name']}** ({pair}): {source.get('attribution', source['url'])}" for pair, source, _, _ in manifest]
+    rows += [f"- **{source['name']}** ({pair}): {source.get('attribution', source.get('url', ''))}" for pair, source, _, _ in manifest]
     rows += kept_credits
     rows += ["", "Glosses are shortened (first senses only) and re-sorted; see `tools/build_dicts.py` for the exact transformation."]
     (out_dir / "SOURCES.md").write_text("\n".join(rows) + "\n", encoding="utf-8", newline="\n")

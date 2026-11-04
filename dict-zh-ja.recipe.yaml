@@ -1,0 +1,11 @@
+# encoding: utf-8
+---
+recipe:
+  Rx: dict-zh-ja
+  args:
+  description: >-
+    Derived zh-ja dictionary for rime-gloss (license: see gloss/dict/SOURCES.md)
+
+install_files: >-
+  gloss/dict/zh-ja.tsv
+  gloss/dict/SOURCES.md
