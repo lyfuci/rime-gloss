@@ -1,14 +1,14 @@
 # Gloss data
 
-Tab-separated files loaded by `lua/rime_gloss_filter.lua`.
-
-Format (see `docs/format.md`):
+Tab-separated files loaded by `lua/rime_gloss_filter.lua`, one set per language
+pair `<source>-<target>` (see `docs/format.md`):
 
 ```text
-中文<TAB>gloss
-中文<TAB>gloss<TAB>pos
+text<TAB>gloss
+text<TAB>gloss<TAB>pos
 ```
 
-- `en.tsv` — English glosses
-- `ja.tsv` — Japanese glosses
-- Files must live under Rime user dir as `gloss/en.tsv`, `gloss/ja.tsv` after install.
+- `zh-en.tsv`, `zh-ja.tsv`: hand-written seed lists (MIT).
+- `user_<pair>.tsv`: the user's own entries; not shipped, never overwritten.
+- `dict/<pair>.tsv`: large imported dictionaries, byte-sorted for on-disk
+  binary search; each keeps its upstream license.

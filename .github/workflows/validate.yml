@@ -3,14 +3,21 @@ name: validate
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
-  tsv:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Validate gloss tables
+      - name: Validate gloss data
         run: python3 tools/validate_tsv.py
+      - name: Install Lua 5.4 (the version librime-lua uses)
+        run: sudo apt-get update -q && sudo apt-get install -y -q lua5.4
+      - name: Filter tests
+        run: lua5.4 tests/filter_test.lua
+      - name: Enable-script tests
+        run: python3 tests/enable_schema_test.py

@@ -1,11 +1,15 @@
 # 贴进你正在用的方案补丁，例如 %APPDATA%\Rime\rime_ice.custom.yaml
 # 文件里需要已有顶层 patch:。已有同名键就不要重复贴。
+# 这是中文输入（zh）的示例；英文或日文方案请改 source / targets 和开关，
+# 或用 tools/enable_schema.py --source en --targets zh 生成。
 #
 # patch:
 #   engine/filters/@next: lua_filter@rime_gloss_filter
-#   switches/@next: {options: [gloss_off, gloss_en, gloss_ja, gloss_both], states: [释义关, 英, 日, 双语], reset: 1}
-#   rime_gloss/default: en
+#   switches/@next: {options: [gloss_off, gloss_en, gloss_ja, gloss_all], states: [释义关, 英, 日, 全部], reset: 1}
+#   rime_gloss/source: zh
+#   rime_gloss/targets: [en, ja]
 
 engine/filters/@next: lua_filter@rime_gloss_filter
-switches/@next: {options: [gloss_off, gloss_en, gloss_ja, gloss_both], states: [释义关, 英, 日, 双语], reset: 1}
-rime_gloss/default: en
+switches/@next: {options: [gloss_off, gloss_en, gloss_ja, gloss_all], states: [释义关, 英, 日, 全部], reset: 1}
+rime_gloss/source: zh
+rime_gloss/targets: [en, ja]
