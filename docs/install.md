@@ -18,10 +18,10 @@
    ```bash
    git clone --depth 1 https://github.com/rime/plum.git ~/plum
    cd ~/plum
-   rime_dir="$APPDATA/Rime" bash rime-install lyfuci/rime-gloss lyfuci/rime-gloss:dict-zh-en
+   rime_dir="$APPDATA/Rime" bash rime-install lyfuci/rime-gloss lyfuci/rime-gloss:dict-zh-en lyfuci/rime-gloss:dict-zh-ja
    ```
 
-   第二个参数是中文→英语大词表（约 7 MB），不要可以去掉。
+   后两个参数是中文→英语大词表（约 7 MB）和中文→日语词表（约 2 MB），不要可以去掉。
 3. 右键托盘里的小狼毫图标 →「输入法设定」，勾选「明月拼音·释义」，确定后会自动部署。
 4. 切到「明月拼音·释义」，打 `xuexi`，候选「学习」旁边应显示 `v. study/learn`。按 `F4`（或 `` Ctrl+` ``）打开方案菜单，可以在 `释义关 / 英 / 日 / 全部` 之间切换。
 
@@ -63,6 +63,7 @@ bash rime-install lyfuci/rime-gloss:ice
 
 ```bash
 bash rime-install lyfuci/rime-gloss:dict-zh-en   # 中文输入看英语
+bash rime-install lyfuci/rime-gloss:dict-zh-ja   # 中文输入看日语（推导词表）
 bash rime-install lyfuci/rime-gloss:dict-en-zh   # 英文输入看中文
 bash rime-install lyfuci/rime-gloss:dict-ja-en   # 日文输入看英语
 ```

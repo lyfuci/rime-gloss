@@ -90,7 +90,7 @@ def main() -> int:
     parser.add_argument("--shared", required=True)
     parser.add_argument("--plugin", required=True)
     parser.add_argument("--installed", type=Path, help="a user dir already filled by the real plum: "
-                        "rime-install lyfuci/rime-gloss lyfuci/rime-gloss:dict-zh-en")
+                        "rime-install lyfuci/rime-gloss lyfuci/rime-gloss:dict-zh-en lyfuci/rime-gloss:dict-zh-ja")
     parser.add_argument("--jaroomaji", type=Path, help="a checkout of lazyfoxchan/rime-jaroomaji: also test Japanese input")
     args = parser.parse_args()
 
@@ -104,11 +104,11 @@ def main() -> int:
         user = Path(tmp) / "demo"
         if args.installed:
             shutil.copytree(args.installed, user)
-            for rel in recipe_files("") + recipe_files("dict-zh-en"):
+            for rel in recipe_files("") + recipe_files("dict-zh-en") + recipe_files("dict-zh-ja"):
                 assert (user / rel).is_file(), f"plum did not install {rel}"
         else:
             user.mkdir()
-            install(user, "", "dict-zh-en")
+            install(user, "", "dict-zh-en", "dict-zh-ja")
         (user / "default.custom.yaml").write_text("patch:\n  schema_list:\n    - schema: rime_gloss_luna\n", encoding="utf-8")
 
         out = probe(args, user, "rime_gloss_luna", "xuexi")
@@ -123,6 +123,9 @@ def main() -> int:
         eq(out.get("电脑"), "n. computer", "seed")
         out = probe(args, user, "rime_gloss_luna", "xueqi", **radio("gloss_en"))
         assert out.get("血气", "") or out.get("学期", ""), f"a dictionary-only word has a gloss: {out}"
+        # Not in the seed list: comes from the derived zh-ja dictionary.
+        out = probe(args, user, "rime_gloss_luna", "jingji", **radio("gloss_ja"))
+        eq(out.get("经济"), "名 経済 けいざい", "derived zh-ja dictionary")
         print("demo schema: ok")
 
         # 2. The recommended route: enable on an existing schema with the script.

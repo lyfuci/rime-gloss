@@ -24,7 +24,9 @@ jobs:
       - name: Enable-script tests
         run: python3 tests/enable_schema_test.py
       - name: Dictionary build tests
-        run: python3 tests/build_dicts_test.py
+        run: |
+          python3 tests/build_dicts_test.py
+          python3 tests/cognates_test.py
 
   e2e:
     # The real librime 1.10 + librime-lua from Ubuntu: deploy, type, read comments.
@@ -52,7 +54,7 @@ jobs:
           git clone -q --depth 1 https://github.com/rime/plum.git "$RUNNER_TEMP/plum"
           dir="$RUNNER_TEMP/plum-rime"
           mkdir -p "$dir"
-          (cd "$RUNNER_TEMP/plum" && rime_dir="$dir" bash rime-install "$REF" "$REF:dict-zh-en") 2>&1 | tee "$RUNNER_TEMP/plum.log"
+          (cd "$RUNNER_TEMP/plum" && rime_dir="$dir" bash rime-install "$REF" "$REF:dict-zh-en" "$REF:dict-zh-ja") 2>&1 | tee "$RUNNER_TEMP/plum.log"
           if grep -qE "No files updated|Invalid recipe|Error" "$RUNNER_TEMP/plum.log"; then
             echo "::error::plum did not install the package cleanly"; exit 1
           fi
