@@ -150,7 +150,7 @@ bash rime-install lyfuci/rime-gloss lyfuci/rime-gloss:dict-zh-en
 
 ```bash
 cd ~/plum
-rime_dir="<用户目录>" bash rime-install lyfuci/rime-gloss lyfuci/rime-gloss:dict-zh-en
+rime_dir="<用户目录>" bash rime-install lyfuci/rime-gloss lyfuci/rime-gloss:dict-zh-en lyfuci/rime-gloss:dict-zh-ja
 # 还要日语输入：加装日语方案和日→英词典
 rime_dir="<用户目录>" bash rime-install lazyfoxchan/rime-jaroomaji lyfuci/rime-gloss:dict-ja-en
 # 英文输入看中文：
