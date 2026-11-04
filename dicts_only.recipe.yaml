@@ -5,8 +5,8 @@ recipe:
   args:
   description: >-
     Update the hand-written seed gloss lists only
-  install_files: >-
-    gloss/zh-en.tsv
-    gloss/zh-ja.tsv
-    gloss/README.md
-    docs/format.md
+
+install_files: >-
+  gloss/zh-en.tsv
+  gloss/zh-ja.tsv
+  gloss/README.md

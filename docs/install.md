@@ -18,7 +18,7 @@
    ```bash
    git clone --depth 1 https://github.com/rime/plum.git ~/plum
    cd ~/plum
-   rime_dir="$APPDATA/Rime" bash rime-install lyfuci/rime-gloss lyfuci/rime-gloss:recipes/dict-zh-en
+   rime_dir="$APPDATA/Rime" bash rime-install lyfuci/rime-gloss lyfuci/rime-gloss:dict-zh-en
    ```
 
    第二个参数是中文→英语大词表（约 7 MB），不要可以去掉。
@@ -46,13 +46,13 @@ rime_dir="$HOME/.local/share/fcitx5/rime" bash rime-install lyfuci/rime-gloss
 只更新词表、不装脚本：
 
 ```bash
-bash rime-install lyfuci/rime-gloss:recipes/dicts_only
+bash rime-install lyfuci/rime-gloss:dicts_only
 ```
 
 已经装了雾凇、想多一个「雾凇拼音·释义」方案：
 
 ```bash
-bash rime-install lyfuci/rime-gloss:recipes/ice
+bash rime-install lyfuci/rime-gloss:ice
 ```
 
 装完在前端里「重新部署」。
@@ -62,9 +62,9 @@ bash rime-install lyfuci/rime-gloss:recipes/ice
 默认配方只装种子词表。要「词典里有的词都显示」，再装对应语言对的词典：
 
 ```bash
-bash rime-install lyfuci/rime-gloss:recipes/dict-zh-en   # 中文输入看英语
-bash rime-install lyfuci/rime-gloss:recipes/dict-en-zh   # 英文输入看中文
-bash rime-install lyfuci/rime-gloss:recipes/dict-ja-en   # 日文输入看英语
+bash rime-install lyfuci/rime-gloss:dict-zh-en   # 中文输入看英语
+bash rime-install lyfuci/rime-gloss:dict-en-zh   # 英文输入看中文
+bash rime-install lyfuci/rime-gloss:dict-ja-en   # 日文输入看英语
 ```
 
 想用最新上游或自己的词典来源，见 README 的「更新词典、换成自己的来源」。

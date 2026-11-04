@@ -46,7 +46,7 @@ powershell -ExecutionPolicy Bypass -File tools\enable.ps1 -Schema rime_ice -Sour
 只想先看效果：部署后勾选「明月拼音·释义」（`rime_gloss_luna`），它用 Rime 自带的明月拼音。已装雾凇、想要独立的「雾凇拼音·释义」方案：
 
 ```bash
-bash rime-install lyfuci/rime-gloss:recipes/ice
+bash rime-install lyfuci/rime-gloss:ice
 ```
 
 缺 `rime_ice.schema.yaml` 时不要装这个配方，部署会报错。
@@ -72,13 +72,13 @@ bash rime-install lyfuci/rime-gloss:recipes/ice
 
 | 配方 | 语言对 | 来源 | 条目 | 许可证 |
 | --- | --- | --- | --- | --- |
-| `:recipes/dict-zh-en` | 中文 → 英语 | CC-CEDICT | 约 20 万 | CC BY-SA 4.0 |
-| `:recipes/dict-ja-en` | 日语 → 英语 | JMdict | 约 47 万 | CC BY-SA 4.0（EDRDG） |
-| `:recipes/dict-en-zh` | 英语 → 中文 | ECDICT（常用 5 万词 + 考试词表） | 约 6 万 | MIT |
-| `:recipes/dicts` | 以上全部 | | | |
+| `:dict-zh-en` | 中文 → 英语 | CC-CEDICT | 约 20 万 | CC BY-SA 4.0 |
+| `:dict-ja-en` | 日语 → 英语 | JMdict | 约 47 万 | CC BY-SA 4.0（EDRDG） |
+| `:dict-en-zh` | 英语 → 中文 | ECDICT（常用 5 万词 + 考试词表） | 约 6 万 | MIT |
+| `:dicts` | 以上全部 | | | |
 
 ```bash
-bash rime-install lyfuci/rime-gloss lyfuci/rime-gloss:recipes/dict-zh-en
+bash rime-install lyfuci/rime-gloss lyfuci/rime-gloss:dict-zh-en
 ```
 
 ### 更新词典、换成自己的来源
@@ -104,9 +104,9 @@ bash rime-install lyfuci/rime-gloss lyfuci/rime-gloss:recipes/dict-zh-en
 | 命令后缀 | 内容 |
 | --- | --- |
 | `lyfuci/rime-gloss` | 词表 + Lua 滤镜 + 明月试用方案 |
-| `:recipes/dicts_only` | 只更新种子词表 |
-| `:recipes/ice` | 上面的全部，再加雾凇试用方案 |
-| `:recipes/dict-<语言对>`、`:recipes/dicts` | 导入的大词表，见上文 |
+| `:dicts_only` | 只更新种子词表 |
+| `:ice` | 上面的全部，再加雾凇试用方案 |
+| `:dict-<语言对>`、`:dicts` | 导入的大词表，见上文 |
 
 ## 开发
 

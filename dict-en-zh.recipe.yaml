@@ -5,6 +5,7 @@ recipe:
   args:
   description: >-
     Imported en-zh dictionary for rime-gloss (license: see gloss/dict/SOURCES.md)
-  install_files: >-
-    gloss/dict/en-zh.tsv
-    gloss/dict/SOURCES.md
+
+install_files: >-
+  gloss/dict/en-zh.tsv
+  gloss/dict/SOURCES.md

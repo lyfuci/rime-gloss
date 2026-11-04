@@ -21,19 +21,44 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def recipe_files(recipe: Path) -> list[str]:
-    match = re.search(r"install_files: >-\n((?:    .*\n)+)", recipe.read_text(encoding="utf-8"))
-    assert match, f"{recipe}: no install_files"
-    return match.group(1).split()
+def section(text: str, name: str) -> list[str]:
+    """plum's print_section: the lines after a top-level `name:` up to the next
+    line that starts with neither whitespace nor '#'."""
+    lines, inside = [], False
+    for line in text.splitlines():
+        if inside and line and not line[0].isspace() and line[0] != "#":
+            break
+        if inside:
+            lines.append(line)
+        elif line.startswith(name + ":"):
+            inside = True
+    return lines
 
 
-def install(user: Path, *recipes: str) -> None:
-    for name in recipes:
-        for rel in recipe_files(ROOT / name):
-            src = ROOT / rel
-            assert src.is_file(), f"{name} lists {rel}, which does not exist"
+def recipe_files(name: str) -> list[str]:
+    """The files `rime-install lyfuci/rime-gloss[:name]` copies, by plum's rules
+    (scripts/recipe.sh): Rx must equal the requested name, install_files must
+    be top-level, patterns are globbed from the package root."""
+    path = ROOT / (f"{name}.recipe.yaml" if name else "recipe.yaml")
+    text = path.read_text(encoding="utf-8")
+    rx = next((l.split("Rx:", 1)[1].strip().strip("'\"") for l in section(text, "recipe") if l.strip().startswith("Rx: ")), "")
+    assert not name or rx == name, f"{path.name}: plum rejects it, Rx {rx!r} does not match {name!r}"
+    patterns = [l.strip().removeprefix("- ") for l in section(text, "install_files") if l.strip() and not l.strip().startswith("#")]
+    patterns = [w for p in patterns for w in p.split()]
+    assert patterns, f"{path.name}: plum installs nothing (no top-level install_files)"
+    files = []
+    for pattern in patterns:
+        matched = sorted(str(m.relative_to(ROOT)) for m in ROOT.glob(pattern) if m.is_file())
+        assert matched, f"{path.name}: {pattern} matches no file"
+        files += matched
+    return files
+
+
+def install(user: Path, *names: str) -> None:
+    for name in names:
+        for rel in recipe_files(name):
             (user / rel).parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, user / rel)
+            shutil.copy2(ROOT / rel, user / rel)
 
 
 def probe(args: argparse.Namespace, user: Path, schema: str, keys: str, **options: bool) -> dict[str, str]:
@@ -64,18 +89,25 @@ def main() -> int:
     parser.add_argument("--probe", required=True)
     parser.add_argument("--shared", required=True)
     parser.add_argument("--plugin", required=True)
+    parser.add_argument("--installed", type=Path, help="a user dir already filled by the real plum: "
+                        "rime-install lyfuci/rime-gloss lyfuci/rime-gloss:dict-zh-en")
     args = parser.parse_args()
 
-    # Every recipe must list only files that exist.
-    for recipe in [ROOT / "recipe.yaml", *sorted((ROOT / "recipes").glob("*.recipe.yaml"))]:
-        for rel in recipe_files(recipe):
-            assert (ROOT / rel).is_file(), f"{recipe.name} lists missing {rel}"
+    # Every recipe is valid for plum.
+    recipe_files("")
+    for path in sorted(ROOT.glob("*.recipe.yaml")):
+        recipe_files(path.name.removesuffix(".recipe.yaml"))
 
     with tempfile.TemporaryDirectory() as tmp:
         # 1. Default recipe + zh-en dictionary, demo schema.
         user = Path(tmp) / "demo"
-        user.mkdir()
-        install(user, "recipe.yaml", "recipes/dict-zh-en.recipe.yaml")
+        if args.installed:
+            shutil.copytree(args.installed, user)
+            for rel in recipe_files("") + recipe_files("dict-zh-en"):
+                assert (user / rel).is_file(), f"plum did not install {rel}"
+        else:
+            user.mkdir()
+            install(user, "", "dict-zh-en")
         (user / "default.custom.yaml").write_text("patch:\n  schema_list:\n    - schema: rime_gloss_luna\n", encoding="utf-8")
 
         out = probe(args, user, "rime_gloss_luna", "xuexi")
@@ -95,7 +127,7 @@ def main() -> int:
         # 2. The recommended route: enable on an existing schema with the script.
         user = Path(tmp) / "existing"
         user.mkdir()
-        install(user, "recipe.yaml", "recipes/dict-zh-en.recipe.yaml")
+        install(user, "", "dict-zh-en")
         (user / "default.custom.yaml").write_text("patch:\n  schema_list:\n    - schema: luna_pinyin\n", encoding="utf-8")
         (user / "luna_pinyin.custom.yaml").write_text("patch:\n  switches/@2/reset: 1\n", encoding="utf-8")
         enable = subprocess.run([sys.executable, str(ROOT / "tools" / "enable_schema.py"), "--schema", "luna_pinyin",
