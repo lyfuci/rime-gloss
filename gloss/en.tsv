@@ -1,0 +1,293 @@
+# rime-gloss data — UTF-8 TSV
+# columns: text<TAB>gloss<TAB>pos
+# license: project MIT; expand via tools/build_from_sources.py
+的	possessive/of	part.
+了	completed action	part.
+是	to be	v.
+在	at/in; -ing	prep./v.
+有	have/there is	v.
+和	and/with	conj.
+我	I/me	pron.
+你	you	pron.
+他	he/him	pron.
+她	she/her	pron.
+它	it	pron.
+们	plural marker	suf.
+这	this	pron.
+那	that	pron.
+哪	which	pron.
+谁	who	pron.
+什么	what	pron.
+怎么	how	adv.
+为什么	why	adv.
+因为	because	conj.
+所以	so/therefore	conj.
+但是	but	conj.
+如果	if	conj.
+虽然	although	conj.
+然后	then/after that	adv.
+已经	already	adv.
+还	still/also	adv.
+也	also	adv.
+都	all/both	adv.
+很	very	adv.
+太	too/extremely	adv.
+更	more	adv.
+最	most	adv.
+不	not	adv.
+没	not have/not yet	adv.
+别	don't	adv.
+请	please	v.
+谢谢	thank you	intj.
+对不起	sorry	intj.
+你好	hello	intj.
+再见	goodbye	intj.
+是的	yes	intj.
+可以	can/OK	v./adj.
+应该	should	v.
+需要	need	v.
+想	want to/think	v.
+要	want/will/need	v.
+会	can/will	v.
+能	can/able	v.
+知道	know	v.
+认识	know (people)/recognize	v.
+觉得	feel/think	v.
+认为	consider/think	v.
+喜欢	like	v.
+爱	love	v.
+看	look/watch/read	v.
+见	see/meet	v.
+听	listen/hear	v.
+说	say/speak	v.
+讲	speak/tell	v.
+读	read	v.
+写	write	v.
+吃	eat	v.
+喝	drink	v.
+睡	sleep	v.
+走	walk/leave	v.
+跑	run	v.
+来	come	v.
+去	go	v.
+回	return	v.
+到	arrive/to	v./prep.
+给	give/for	v./prep.
+用	use/with	v./prep.
+做	do/make	v.
+作	do/make (formal)	v.
+工作	work/job	v./n.
+学习	study/learn	v.
+学	study/learn	v.
+教	teach	v.
+买	buy	v.
+卖	sell	v.
+开	open/drive/start	v.
+关	close/turn off	v.
+开始	begin/start	v.
+结束	end/finish	v.
+完成	complete/finish	v.
+帮助	help	v./n.
+帮	help	v.
+等	wait/etc.	v.
+找	look for	v.
+让	let/make	v.
+叫	call/be called	v.
+告诉	tell	v.
+问	ask	v.
+回答	answer	v./n.
+懂	understand	v.
+明白	understand/clear	v./adj.
+记得	remember	v.
+忘记	forget	v.
+希望	hope	v./n.
+决定	decide/decision	v./n.
+选择	choose/choice	v./n.
+改变	change	v./n.
+成为	become	v.
+发生	happen	v.
+出现	appear	v.
+发现	discover/find	v.
+注意	pay attention	v.
+准备	prepare	v.
+介绍	introduce	v.
+欢迎	welcome	v.
+参加	participate	v.
+离开	leave	v.
+进入	enter	v.
+出来	come out	v.
+上去	go up	v.
+下来	come down	v.
+起来	get up/start to	v.
+人	person/people	n.
+男人	man	n.
+女人	woman	n.
+孩子	child	n.
+朋友	friend	n.
+家人	family	n.
+爸爸	dad	n.
+妈妈	mom	n.
+老师	teacher	n.
+学生	student	n.
+医生	doctor	n.
+名字	name	n.
+时间	time	n.
+时候	moment/when	n.
+今天	today	n.
+明天	tomorrow	n.
+昨天	yesterday	n.
+现在	now	n./adv.
+以前	before/formerly	n./adv.
+以后	after/later	n./adv.
+年	year	n.
+月	month/moon	n.
+日	day/sun	n.
+天	day/sky	n.
+小时	hour	n.
+分钟	minute	n.
+早上	morning	n.
+中午	noon	n.
+下午	afternoon	n.
+晚上	evening/night	n.
+地方	place	n.
+家	home/family	n.
+学校	school	n.
+公司	company	n.
+商店	shop	n.
+医院	hospital	n.
+饭店	restaurant/hotel	n.
+中国	China	n.
+美国	USA	n.
+日本	Japan	n.
+城市	city	n.
+国家	country	n.
+世界	world	n.
+东西	thing	n.
+事情	matter/affair	n.
+问题	question/problem	n.
+方法	method	n.
+机会	opportunity	n.
+生活	life/live	n./v.
+语言	language	n.
+汉语	Chinese (lang.)	n.
+英语	English (lang.)	n.
+日语	Japanese (lang.)	n.
+字	character/word	n.
+词	word	n.
+句子	sentence	n.
+书	book	n.
+水	water	n.
+茶	tea	n.
+咖啡	coffee	n.
+饭	meal/rice	n.
+菜	dish/vegetable	n.
+钱	money	n.
+车	car/vehicle	n.
+电脑	computer	n.
+手机	mobile phone	n.
+电话	telephone	n.
+电影	movie	n.
+音乐	music	n.
+天气	weather	n.
+大	big	adj.
+小	small	adj.
+多	many/much	adj.
+少	few/little	adj.
+好	good	adj.
+坏	bad	adj.
+新	new	adj.
+旧	old (thing)	adj.
+老	old (age)/always	adj./adv.
+高	tall/high	adj.
+低	low	adj.
+长	long	adj.
+短	short	adj.
+快	fast/quick	adj.
+慢	slow	adj.
+早	early	adj.
+晚	late	adj.
+热	hot	adj.
+冷	cold	adj.
+忙	busy	adj.
+累	tired	adj.
+对	correct/right; to	adj./prep.
+错	wrong	adj.
+重要	important	adj.
+简单	simple	adj.
+容易	easy	adj.
+难	difficult	adj.
+一样	same	adj.
+不同	different	adj.
+漂亮	beautiful/pretty	adj.
+开心	happy	adj.
+高兴	glad/happy	adj.
+一	one	num.
+二	two	num.
+两	two (measure)	num.
+三	three	num.
+四	four	num.
+五	five	num.
+六	six	num.
+七	seven	num.
+八	eight	num.
+九	nine	num.
+十	ten	num.
+百	hundred	num.
+千	thousand	num.
+万	ten thousand	num.
+个	general measure	m.
+次	time (occurrence)	m.
+上	up/on/above	n./v.
+下	down/below/next	n./v.
+里	inside	n.
+外	outside	n.
+前	front/before	n.
+后	back/after	n.
+左	left	n.
+右	right	n.
+中	middle/Chinese	n.
+从	from	prep.
+向	toward	prep.
+为	for/as	prep.
+以	by/with/in order to	prep.
+把	disposal marker	prep.
+被	passive marker	prep.
+比	than/compare	prep./v.
+跟	with/and	prep./conj.
+对了	by the way/correct	intj.
+当然	of course	adv.
+也许	maybe	adv.
+可能	possible/maybe	adj./adv.
+一定	certainly	adv.
+一起	together	adv.
+一直	always/straight	adv.
+马上	immediately	adv.
+刚刚	just now	adv.
+经常	often	adv.
+有时候	sometimes	adv.
+从来	always/never (with 不/没)	adv.
+其实	actually	adv.
+特别	especially/special	adv./adj.
+非常	extremely	adv.
+输入	input	v./n.
+法	law/method	n.
+输入法	input method	n.
+候选	candidate	n.
+注释	annotation/comment	n.
+翻译	translate/translation	v./n.
+单词	word (vocabulary)	n.
+动词	verb	n.
+名词	noun	n.
+形容词	adjective	n.
+副词	adverb	n.
+练习	practice	v./n.
+复习	review	v.
+考试	exam/test	n./v.
+成绩	grade/score	n.
+水平	level	n.
+进步	progress	v./n.
+错误	error/mistake	n.
+正确	correct	adj.
+意思	meaning	n.
+例子	example	n.
+解释	explain/explanation	v./n.

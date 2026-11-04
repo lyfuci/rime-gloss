@@ -1,0 +1,12 @@
+# encoding: utf-8
+---
+recipe:
+  Rx: dicts_only
+  args:
+  description: >-
+    Update gloss TSV data only
+  install_files: >-
+    gloss/en.tsv
+    gloss/ja.tsv
+    gloss/README.md
+    docs/format.md

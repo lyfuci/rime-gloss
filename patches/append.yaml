@@ -1,0 +1,11 @@
+# 贴进你正在用的方案补丁，例如 %APPDATA%\Rime\rime_ice.custom.yaml
+# 文件里需要已有顶层 patch:。已有同名键就不要重复贴。
+#
+# patch:
+#   engine/filters/@next: lua_filter@rime_gloss_filter
+#   switches/@next: {options: [gloss_off, gloss_en, gloss_ja, gloss_both], states: [释义关, 英, 日, 双语], reset: 1}
+#   rime_gloss/default: en
+
+engine/filters/@next: lua_filter@rime_gloss_filter
+switches/@next: {options: [gloss_off, gloss_en, gloss_ja, gloss_both], states: [释义关, 英, 日, 双语], reset: 1}
+rime_gloss/default: en
