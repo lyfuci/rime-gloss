@@ -41,20 +41,22 @@ bash rime-install lyfuci/rime-gloss:recipes/ice
    - 鼠须管：`~/Library/Rime`
    - fcitx5：`~/.local/share/fcitx5/rime`
 2. 编辑 `<方案>.custom.yaml`，例如 `rime_ice.custom.yaml`。没有就新建，内容以 `patch:` 开头。
-3. 在 `patch:` 下面加入 `patches/append.yaml` 里的三行。
+3. 在 `patch:` 下面加入 `patches/append.yaml` 里的四行，按你的方案改 `source`（候选的语言）和 `targets`（想看的语言）。
 4. 重新部署。
-5. 方案选单里应出现 `释义关 / 英 / 日 / 双语`。默认是「英」。
+5. 方案选单里应出现 `释义关 / 英 / 日 / 全部`。默认是第一种目标语言。
 
 也可以在仓库里运行：
 
 ```bash
-python3 tools/enable_schema.py --schema rime_ice
+python3 tools/enable_schema.py --schema rime_ice --source zh --targets en,ja
+# 英文输入方案看中文释义
+python3 tools/enable_schema.py --schema melt_eng --source en --targets zh
 ```
 
-Windows：
+Windows（PowerShell 脚本，需要手动运行；`Bypass` 只对这一次运行放开脚本限制）：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File tools\enable.ps1 -Schema rime_ice
+powershell -ExecutionPolicy Bypass -File tools\enable.ps1 -Schema rime_ice -Source zh -Targets en,ja
 ```
 
 脚本只在补丁文件里追加滤镜，不会改词库，也不会覆盖已有的 `rime_gloss_filter` 行。
@@ -80,4 +82,4 @@ cd plum
 bash rime-install lyfuci/rime-gloss
 ```
 
-然后重新部署。`gloss/user_en.tsv`、`gloss/user_ja.tsv` 不在仓库里，更新不会覆盖它们。
+然后重新部署。`gloss/user_<输入语言>-<目标语言>.tsv`（如 `gloss/user_zh-en.tsv`）不在配方里，更新不会覆盖它们。

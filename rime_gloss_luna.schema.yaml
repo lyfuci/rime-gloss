@@ -7,11 +7,12 @@ __include: luna_pinyin.schema:/
 __patch:
   schema/schema_id: rime_gloss_luna
   schema/name: 明月拼音·释义
-  schema/version: "0.1.0"
-  schema/description: "luna_pinyin + rime-gloss 英/日简释。学习向，不改变上屏文本。"
+  schema/version: "0.2.0"
+  schema/description: "luna_pinyin + rime-gloss 英/日释义。学习向，不改变上屏文本。"
   engine/filters/@next: lua_filter@rime_gloss_filter
   switches/@next:
-    options: [gloss_off, gloss_en, gloss_ja, gloss_both]
-    states: [释义关, 英, 日, 双语]
+    options: [gloss_off, gloss_en, gloss_ja, gloss_all]
+    states: [释义关, 英, 日, 全部]
     reset: 1
-  rime_gloss/default: en
+  rime_gloss/source: zh
+  rime_gloss/targets: [en, ja]

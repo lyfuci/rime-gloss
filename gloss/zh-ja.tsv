@@ -1,6 +1,6 @@
 # rime-gloss data — UTF-8 TSV
 # columns: text<TAB>gloss<TAB>pos
-# license: project MIT; expand via tools/build_from_sources.py
+# license: MIT (this project). Large imported dictionaries live in gloss/dict/ with their own licenses.
 的	の	助
 了	た／了	助
 是	である／です	動

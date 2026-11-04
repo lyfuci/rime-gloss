@@ -4,11 +4,11 @@ recipe:
   Rx: gloss
   args:
   description: >-
-    rime-gloss: EN/JA learning glosses beside Chinese candidates
+    rime-gloss: target-language glosses beside candidates of any input language
   install_files: >-
     lua/rime_gloss_filter.lua
-    gloss/en.tsv
-    gloss/ja.tsv
+    gloss/zh-en.tsv
+    gloss/zh-ja.tsv
     gloss/README.md
     rime_gloss_luna.schema.yaml
     patches/append.yaml

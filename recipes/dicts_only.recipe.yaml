@@ -6,7 +6,7 @@ recipe:
   description: >-
     Update gloss TSV data only
   install_files: >-
-    gloss/en.tsv
-    gloss/ja.tsv
+    gloss/zh-en.tsv
+    gloss/zh-ja.tsv
     gloss/README.md
     docs/format.md
