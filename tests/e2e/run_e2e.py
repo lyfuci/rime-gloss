@@ -141,6 +141,10 @@ def main() -> int:
         eq(out.get("学习"), "v. study/learn", "enabled on luna_pinyin, default target")
         out = probe(args, user, "luna_pinyin", "nihao", gloss_off=False, gloss_en=True)
         assert out.get("你好"), f"你好 has a gloss: {out}"
+        # A user line "-" hides a word, even one the seed list glosses.
+        (user / "gloss" / "user_zh-en.tsv").write_text("电脑\t-\n", encoding="utf-8")
+        out = probe(args, user, "luna_pinyin", "diannao")
+        eq(out.get("电脑"), "", "hidden by the user list")
         print("enable_schema on luna_pinyin: ok")
 
         # 3. Japanese input: jaroomaji + the ja-en dictionary.

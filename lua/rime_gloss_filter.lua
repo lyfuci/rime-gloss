@@ -13,6 +13,7 @@
 --   gloss/<pair>.tsv        hand-written seed list, loaded into memory
 --   gloss/user_<pair>.tsv   the user's own entries, loaded into memory
 -- Line format: text<TAB>gloss<TAB>part-of-speech (third column optional).
+-- In the seed and user lists, a gloss of "-" hides the word.
 
 local MAX_ONE = 42
 local MAX_ALL = 96
@@ -189,8 +190,13 @@ local FOLDS = {
   ja = katakana_to_hiragana, -- ネコ finds ねこ
 }
 
+-- A gloss of "-" in a seed or user list hides the word: no gloss, and the
+-- large dictionary is not consulted (for a wrong imported entry).
+local HIDDEN = "-"
+
 local function lookup(pair, text, fold)
   local hit = pair.mem[text]
+  if hit and hit.gloss == HIDDEN then return nil end
   if not hit and pair.dict then hit = search_sorted(pair.dict, text) end
   if not hit and fold then
     local folded = fold(text)

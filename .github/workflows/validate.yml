@@ -21,8 +21,10 @@ jobs:
         run: |
           lua5.4 tests/filter_test.lua
           lua5.4 tests/dict_lookup_test.lua
-      - name: Enable-script tests
-        run: python3 tests/enable_schema_test.py
+      - name: Enable- and contribute-script tests
+        run: |
+          python3 tests/enable_schema_test.py
+          python3 tests/contribute_test.py
       - name: Dictionary build tests
         run: |
           python3 tests/build_dicts_test.py
