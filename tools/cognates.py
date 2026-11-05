@@ -101,6 +101,7 @@ class JaEntry:
     first_words: set[str] = field(default_factory=set)
     first_gloss: str = ""
     first_bare: str = ""
+    sense_glosses: list[str] = field(default_factory=list)  # every gloss of the first sense
     senses: int = 0
     marked: bool = False   # honorific, humble, archaic, ...: not what a learner wants first
 
@@ -143,6 +144,7 @@ def read_jmdict(data: bytes) -> list[JaEntry]:
                                first_words=meaning_words(" ; ".join(g.text or "" for g in senses[0].findall("gloss"))),
                                first_gloss=norm_gloss(first.text or "") if first is not None else "",
                                first_bare=bare_gloss(first.text or "") if first is not None else "",
+                               sense_glosses=[g.text or "" for g in senses[0].findall("gloss")],
                                senses=len(senses), marked=marked))
         el.clear()
     return entries
@@ -156,6 +158,7 @@ class ZhWord:
     senses: list[str]       # of the most used reading, split into single meanings
     words: set[str]         # meaning words of that reading
     main_words: set[str] = field(default_factory=set)  # of its first two meanings
+    proper: bool = False    # place and person names: only paired by written form
 
 
 def read_cedict(text: str) -> list[ZhWord]:
@@ -165,18 +168,19 @@ def read_cedict(text: str) -> list[ZhWord]:
         if not m or line.startswith("#"):
             continue
         trad, simp, pinyin, defs = m.groups()
-        if pinyin[:1].isupper():  # proper nouns
-            continue
         meanings = [part.strip() for sense in defs.split("/") for part in sense.split(";")]
         meanings = [mng for mng in meanings if mng and not mng.startswith(SKIP)]
         if meanings:
             by_simp.setdefault(simp, []).append((trad, pinyin, meanings))
     words = []
     for simp, readings in by_simp.items():
+        common = [r for r in readings if not r[1][:1].isupper()]
+        proper = not common
+        readings = common or readings
         trad, pinyin, meanings = max(readings, key=lambda r: len(r[2]))  # most senses: the everyday reading
         words.append(ZhWord(simp=simp, trads=list(dict.fromkeys([trad] + [r[0] for r in readings])),
                             pinyin=pinyin, senses=meanings, words=meaning_words(" ; ".join(meanings)),
-                            main_words=meaning_words(" ; ".join(meanings[:2]))))
+                            main_words=meaning_words(" ; ".join(meanings[:2])), proper=proper))
     return words
 
 
@@ -189,32 +193,44 @@ def pair_words(cedict_text: str, jmdict_data: bytes, shin_chars: str, shin_phras
 
     ja = read_jmdict(jmdict_data)
     by_keb: dict[str, list[JaEntry]] = {}
-    by_gloss: dict[str, list[JaEntry]] = {}
-    by_bare: dict[str, list[JaEntry]] = {}
+    # Tiers: 0 the entry's first gloss, 1 any gloss of its first sense; each
+    # exact, or (tiers 2, 3) without parentheses plus a second shared word.
+    exact: list[dict[str, list[JaEntry]]] = [{}, {}]
+    bare: list[dict[str, list[JaEntry]]] = [{}, {}]
     for e in ja:
         for keb in e.kebs:
             by_keb.setdefault(keb, []).append(e)
-        if e.common and not e.marked and e.first_gloss:
-            by_gloss.setdefault(e.first_gloss, []).append(e)
-            by_bare.setdefault(e.first_bare, []).append(e)
+        if e.common and not e.marked and e.sense_glosses:
+            for i, gloss in enumerate(e.sense_glosses):
+                tier = 0 if i == 0 else 1
+                exact[tier].setdefault(norm_gloss(gloss), []).append(e)
+                bare[tier].setdefault(bare_gloss(gloss), []).append(e)
 
     def pivot_for(zh: ZhWord) -> JaEntry | None:
         """An exact first-gloss match counts as is; a match only after dropping
         parentheses needs a second shared meaning word (来 -> 来る "to come
         (spatially or temporally)", but not 书房 "study (room)" -> 勉強)."""
-        found: dict[int, tuple[JaEntry, int]] = {}
+        if zh.proper:
+            return None
+        found: dict[int, tuple[tuple, JaEntry]] = {}
         for meaning in zh.senses[:3]:
-            for e in by_gloss.get(norm_gloss(meaning), []):
-                found[id(e)] = (e, len(zh.words & e.words))
-            for e in by_bare.get(bare_gloss(meaning), []):
-                overlap = len(zh.words & e.words)
-                if overlap >= 2:
-                    found.setdefault(id(e), (e, overlap))
+            for tier in (0, 1):
+                for e in exact[tier].get(norm_gloss(meaning), []):
+                    overlap = len(zh.words & e.words)
+                    if tier == 1 and overlap < 2:
+                        continue  # a secondary gloss alone is too loose (综述 "to sum up" -> 加える)
+                    key = (e.marked, e.rank[0], tier) + e.pivot_rank(overlap)[2:]
+                    found[id(e)] = min(found.get(id(e), (key, e)), (key, e), key=lambda x: x[0])
+                for e in bare[tier].get(bare_gloss(meaning), []):
+                    overlap = len(zh.words & e.words)
+                    if overlap >= 2:
+                        key = (e.marked, e.rank[0], tier + 2) + e.pivot_rank(overlap)[2:]
+                        found.setdefault(id(e), (key, e))
             if found:
                 break
         if not found:
             return None
-        return min(found.values(), key=lambda item: item[0].pivot_rank(item[1]))[0]
+        return min(found.values(), key=lambda item: item[0])[1]
 
     pairs = []
     for zh in read_cedict(cedict_text):
@@ -225,7 +241,7 @@ def pair_words(cedict_text: str, jmdict_data: bytes, shin_chars: str, shin_phras
                 overlap = len(zh.words & e.words)
                 single = len(form) == 1
                 # The shared meaning must include both words' main senses.
-                if not overlap or not (zh.main_words & e.first_words) or not (e.common or overlap >= 2):
+                if not overlap or not (zh.main_words & e.first_words):
                     continue
                 if single and (not e.common or e.pos in ("接尾", "接頭", "助数")):
                     continue
