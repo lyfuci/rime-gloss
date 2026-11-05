@@ -94,10 +94,10 @@ eq(G.search_sorted(user .. sep .. "nolf.tsv", "b").gloss, "B", "last line withou
 eq(G.search_sorted(user .. sep .. "missing.tsv", "a"), nil, "missing file")
 
 -- Fixture data: zh-en dictionary, seed and user override; zh-ja seed; en-zh dictionary.
-write(user, "gloss/dict/zh-en.tsv", "学习\tdict study\tv.\n电脑\tcomputer\tn.\n苹果\tapple (dict)\tn.\n")
+write(user, "gloss/dict/zh-en.tsv", "学习\tdict study\tv.\n电脑\tcomputer\tn.\n苹果\tapple (dict)\tn.\n键盘\tkeyboard\tn.\n")
 write(shared, "gloss/zh-en.tsv", "# shared seed\n苹果\tapple (shared)\tn.\n")
 write(user, "gloss/zh-en.tsv", "学习\tstudy/learn\tv.\n苹果\tapple (seed)\tn.\n")
-write(user, "gloss/user_zh-en.tsv", "苹果\tapple (mine)\tn.\n")
+write(user, "gloss/user_zh-en.tsv", "苹果\tapple (mine)\tn.\n电脑\t-\n")
 write(user, "gloss/zh-ja.tsv", "学习\t学ぶ\t動\n")
 write(shared, "gloss/dict/en-zh.tsv", "apple\t苹果\tn.\nstudy\t学习\tv.\n")
 
@@ -133,10 +133,11 @@ local function run(config, options, texts)
 end
 
 local zh = { ["rime_gloss/source"] = "zh", ["rime_gloss/targets"] = { "en", "ja" } }
-local c = run(zh, { gloss_en = true }, { "学习", "苹果", "电脑", "没有" })
+local c = run(zh, { gloss_en = true }, { "学习", "苹果", "电脑", "没有", "键盘" })
+eq(c["键盘"], "n. keyboard", "dictionary fills what the seed lacks")
 eq(c["学习"], "v. study/learn", "seed beats dictionary")
 eq(c["苹果"], "n. apple (mine)", "user beats seed beats shared seed")
-eq(c["电脑"], "n. computer", "dictionary fills what the seed lacks")
+eq(c["电脑"], "", "a user \"-\" hides the dictionary entry")
 eq(c["没有"], "", "no entry, no comment")
 
 c = run(zh, { gloss_ja = true }, { "学习", "电脑" })
@@ -145,7 +146,7 @@ eq(c["电脑"], "", "no ja entry")
 
 c = run(zh, { gloss_all = true }, { "学习", "电脑" })
 eq(c["学习"], "en: v. study/learn · ja: 動 学ぶ", "all targets labelled")
-eq(c["电脑"], "en: n. computer", "all with one hit")
+eq(c["电脑"], "", "hidden in all mode too")
 
 c = run(zh, { gloss_off = true }, { "学习" })
 eq(c["学习"], "", "off")
