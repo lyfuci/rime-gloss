@@ -25,7 +25,9 @@ import os
 import re
 import sys
 import tempfile
+import time
 import tomllib
+import urllib.error
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -40,6 +42,8 @@ MAX_DOWNLOAD = 256 * 1024 * 1024
 MAX_KEY_BYTES = 64
 MAX_GLOSS_CHARS = 60
 SENSE_BUDGET = 36
+FETCH_ATTEMPTS = 4
+FETCH_RETRY_DELAY = 2.0
 
 # (key, gloss, pos, rank): lower rank wins when a key appears twice in one source.
 Entry = tuple[str, str, str, tuple]
@@ -77,7 +81,13 @@ def usable_key(key: str) -> bool:
 # --- fetching -----------------------------------------------------------------
 
 
-def fetch(url: str, cache: Path) -> bytes:
+def fetch(
+    url: str,
+    cache: Path,
+    *,
+    attempts: int = FETCH_ATTEMPTS,
+    retry_delay: float = FETCH_RETRY_DELAY,
+) -> bytes:
     """The raw bytes of a source: a local path, or an https:// URL (cached by URL)."""
     if not re.match(r"^[a-z]+://", url):
         return Path(url).expanduser().read_bytes()
@@ -89,8 +99,34 @@ def fetch(url: str, cache: Path) -> bytes:
         return path.read_bytes()
     print(f"  downloading {url}", file=sys.stderr)
     request = urllib.request.Request(url, headers={"User-Agent": "rime-gloss build_dicts"})
-    with urllib.request.urlopen(request, timeout=120) as response:
-        data = response.read(MAX_DOWNLOAD + 1)
+    data: bytes | None = None
+    for attempt in range(1, max(1, attempts) + 1):
+        try:
+            with urllib.request.urlopen(request, timeout=120) as response:
+                data = response.read(MAX_DOWNLOAD + 1)
+            break
+        except urllib.error.HTTPError as exc:
+            retryable = exc.code >= 500 or exc.code == 429
+            if not retryable or attempt >= attempts:
+                raise
+            delay = retry_delay * (2 ** (attempt - 1))
+            print(
+                f"  download failed ({exc}), retrying {attempt}/{attempts - 1} in {delay:.0f}s",
+                file=sys.stderr,
+            )
+            if delay > 0:
+                time.sleep(delay)
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            if attempt >= attempts:
+                raise
+            delay = retry_delay * (2 ** (attempt - 1))
+            print(
+                f"  download failed ({exc}), retrying {attempt}/{attempts - 1} in {delay:.0f}s",
+                file=sys.stderr,
+            )
+            if delay > 0:
+                time.sleep(delay)
+    assert data is not None
     if len(data) > MAX_DOWNLOAD:
         raise SystemExit(f"{url} is larger than {MAX_DOWNLOAD} bytes")
     path.write_bytes(data)

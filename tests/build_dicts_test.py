@@ -4,11 +4,15 @@
 from __future__ import annotations
 
 import gzip
+import importlib.util
+import io
 import subprocess
 import sys
 import tempfile
+import urllib.error
 import zipfile
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "tools" / "build_dicts.py"
@@ -153,5 +157,54 @@ license = "MIT"
     # --rime-dir writes into <dir>/gloss/dict.
     result = run("--config", str(config2), "--rime-dir", str(t / "Rime"), "--url", f"a={other}")
     assert result.returncode == 0 and (t / "Rime" / "gloss" / "dict" / "zh-en.tsv").exists(), result.stderr
+
+    # fetch() retries transient network timeouts/5xx errors and caches the result,
+    # without retrying non-retryable 4xx errors.
+    def test_fetch_retries(retry_cache: Path) -> None:
+        spec = importlib.util.spec_from_file_location("build_dicts", SCRIPT)
+        assert spec is not None and spec.loader is not None
+        build_dicts = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(build_dicts)
+
+        class FakeResponse(io.BytesIO):
+            def __enter__(self) -> "FakeResponse":
+                return self
+
+            def __exit__(self, *args: object) -> None:
+                self.close()
+
+        transient_calls = 0
+
+        def flaky_urlopen(request: object, timeout: int = 0) -> FakeResponse:
+            nonlocal transient_calls
+            transient_calls += 1
+            if transient_calls == 1:
+                raise TimeoutError("timed out")
+            if transient_calls == 2:
+                raise urllib.error.HTTPError("https://example.invalid/a", 503, "Service Unavailable", {}, None)
+            return FakeResponse(b"ok-bytes")
+
+        with mock.patch.object(build_dicts.urllib.request, "urlopen", side_effect=flaky_urlopen):
+            got = build_dicts.fetch("https://example.invalid/a", retry_cache, attempts=3, retry_delay=0)
+            assert got == b"ok-bytes" and transient_calls == 3
+            # Second call hits cache without calling urlopen again.
+            assert build_dicts.fetch("https://example.invalid/a", retry_cache, attempts=3, retry_delay=0) == b"ok-bytes"
+            assert transient_calls == 3
+
+        not_found_calls = 0
+
+        def not_found_urlopen(request: object, timeout: int = 0) -> FakeResponse:
+            nonlocal not_found_calls
+            not_found_calls += 1
+            raise urllib.error.HTTPError("https://example.invalid/missing", 404, "Not Found", {}, None)
+
+        with mock.patch.object(build_dicts.urllib.request, "urlopen", side_effect=not_found_urlopen):
+            try:
+                build_dicts.fetch("https://example.invalid/missing", retry_cache, attempts=3, retry_delay=0)
+                raise AssertionError("expected 404 HTTPError")
+            except urllib.error.HTTPError as exc:
+                assert exc.code == 404 and not_found_calls == 1
+
+    test_fetch_retries(t / "retry-cache")
 
 print("build_dicts_test: ok")
